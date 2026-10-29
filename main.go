@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
 )
 
 type Chat struct {
@@ -35,6 +36,10 @@ type TelegramResponse struct {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("Файл .env не найден, используем переменные окружения")
+	}
+
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
 		log.Fatal("DATABASE_URL не задан")
