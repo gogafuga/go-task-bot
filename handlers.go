@@ -108,6 +108,18 @@ func HandleDelete(conn *pgx.Conn, token string, chatID int64, messageText string
 	SendMessage(token, chatID, "✅ Задача удалена!")
 }
 
+func HandleStats(conn *pgx.Conn, token string, chatID int64) {
+	total, done, undone, err := commandsbot.StatsTask(conn, chatID)
+	if err != nil {
+		SendMessage(token, chatID, "Ошибка получения статистики (...")
+		return
+	}
+
+	SendMessage(token, chatID, "📊 Статистика задач")
+	message := fmt.Sprintf("Всего задач: %d \n Выполнено: %d \n Осталось: %d", total, done, undone)
+	SendMessage(token, chatID, message)
+}
+
 func HandleUpdate(conn *pgx.Conn, token string, update Update) {
 
 	if update.Message.Text == "/start" {
@@ -132,6 +144,11 @@ func HandleUpdate(conn *pgx.Conn, token string, update Update) {
 
 	if strings.HasPrefix(update.Message.Text, "/delete") {
 		HandleDelete(conn, token, update.Message.Chat.ID, update.Message.Text)
+		return
+	}
+
+	if update.Message.Text == "/stats" {
+		HandleStats(conn, token, update.Message.Chat.ID)
 		return
 	}
 }
